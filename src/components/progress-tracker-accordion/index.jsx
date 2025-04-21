@@ -9,9 +9,9 @@ import {
   AccordionContent,
   AccordionItem,
 } from "@/components/ui/accordion"
+import StepperComponent from "../comp-528"
 
-
-export default function AccordionComponent({items}) {
+export default function AccordionComponent({items, content}) {
   return (
     <div className="space-y-4">
       <h2 className="text-3xl font-bold">Look how far you have come</h2>
@@ -47,7 +47,7 @@ export default function AccordionComponent({items}) {
               </AccordionPrimitive.Trigger>
             </AccordionPrimitive.Header>
             <AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
-              {item.content}
+              <StepperComponent/>
             </AccordionContent>
           </AccordionItem>
         ))}
