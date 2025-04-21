@@ -33,7 +33,7 @@ const data = {
   navMain: [
     {
       title: 'Upload Image',
-      url: '#',
+      url: '/dashboard',
       icon: LayoutDashboardIcon,
     },
     {
@@ -43,7 +43,7 @@ const data = {
     },
     {
       title: 'Progress Tracker',
-      url: '#',
+      url: '/dashboard/progressTracker',
       icon: BarChartIcon,
     },
    

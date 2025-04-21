@@ -13,7 +13,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Loader } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
+import { addDiseaseForUser } from "../../firebase/firestoreConnect"
 const Dashboard = () => {
   const { getUser } = useContext(AuthContext)
   const router = useRouter()
@@ -33,28 +33,52 @@ const Dashboard = () => {
   
 
 const handleUpload = async () => {
-    if (!image) {
-      console.error('No image selected');
-      toast.error("Please select an image")
-      return;
-    }
-    
-    setisUploadingImageAndFetchingName(true);
-    const result = await uploadImage(image);
-    const [d1, d2] = result.result.split(',');
-    setDiseaseName(d1)
-    setSeverity(d2)
-
-    const formData = new FormData();
-    formData.append("file", image);
-    await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-    
-    setisUploadingImageAndFetchingName(false)
-  };
+  if (!image) {
+    console.error('No image selected');
+    toast.error("Please select an image");
+    return;
+  }
   
+  setisUploadingImageAndFetchingName(true);
+  const result = await uploadImage(image);
+
+  if (!result?.result) {
+    console.error('Invalid result from uploadImage');
+    toast.error("Failed to upload image");
+    setisUploadingImageAndFetchingName(false);
+    return;
+  }
+
+  const [d1, d2] = result.result.split(',');
+
+  if (!d1 || !d2) {
+    console.error('Disease name or severity is missing');
+    toast.error("Failed to extract disease details");
+    setisUploadingImageAndFetchingName(false);
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", image);
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+  const { url } = await response.json();
+
+  if (!url) {
+    console.error('Failed to upload image to server');
+    toast.error("Image upload failed");
+    setisUploadingImageAndFetchingName(false);
+    return;
+  }
+
+  setisUploadingImageAndFetchingName(false);
+  const user = getUser();
+
+  await addDiseaseForUser(user.email, d1, d2, url);
+};
+
   const handleDiseaseData = async () =>{
     if(diseaseName == null || diseaseName == undefined){
       toast.error("no disease choosen")
