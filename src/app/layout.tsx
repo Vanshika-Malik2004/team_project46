@@ -1,18 +1,15 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Figtree } from 'next/font/google'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css' // Import toastify CSS
 import { AuthProvider } from '../context/authContext'
-import './globals.css'
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+import './globals.css';
+
+const figtree = Figtree({
+  variable: '--font-figtree',
   subsets: ['latin'],
 })
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -27,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${figtree.className} antialiased`}
       >
         <ToastContainer />
         <AuthProvider>{children}</AuthProvider>

@@ -5,6 +5,7 @@ import {
   FolderIcon,
   LayoutDashboardIcon,
   ListIcon,
+  LogOut,
   UsersIcon,
 } from 'lucide-react'
 
@@ -17,6 +18,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar'
 
 import { Button } from '@/components/ui/button'
@@ -55,6 +57,7 @@ const data = {
 
 const AppSidebar = ({ ...props }) => {
    const router = useRouter()
+   const { open } = useSidebar();
     const { getUser, signOutUser } = useContext(AuthContext)
    const handleLogout = () => {
       signOutUser()
@@ -63,16 +66,22 @@ const AppSidebar = ({ ...props }) => {
     }
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
-        <SidebarMenu className="p-4 border-b">
-            <Logo />
+      <SidebarHeader className='border-b'>
+        <SidebarMenu className="py-2 px-4 flex flex-row items-center justify-between ">
+            <Logo/>
+            {
+              open && <SidebarTrigger />
+            }
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <Button onClick={handleLogout} className='px-3 py-1.5'>signOut</Button>
+        <Button onClick={handleLogout} className='px-3 py-1.5 w-full'>
+          <LogOut className='w-4 h-4' />
+          <span className='ml-2'>Sign Out</span>
+        </Button>
       </SidebarFooter>
     </Sidebar>
   )
