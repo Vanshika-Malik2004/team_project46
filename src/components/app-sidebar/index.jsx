@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   BarChartIcon,
@@ -7,10 +7,10 @@ import {
   ListIcon,
   LogOut,
   UsersIcon,
-} from 'lucide-react'
+} from "lucide-react";
 
-import { Logo } from '@/components/logo'
-import NavMain from '@/components/nav-main'
+import { Logo } from "@/components/logo";
+import NavMain from "@/components/nav-main";
 import {
   Sidebar,
   SidebarContent,
@@ -19,70 +19,63 @@ import {
   SidebarMenu,
   SidebarTrigger,
   useSidebar,
-} from '@/components/ui/sidebar'
+} from "@/components/ui/sidebar";
 
-import { Button } from '@/components/ui/button'
-import { AuthContext } from '@/context/authContext'
+import { Button } from "@/components/ui/button";
+import { AuthContext } from "@/context/authContext";
 
-import { useRouter } from 'next/navigation'
-import { useContext } from 'react'
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
 
-import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const sidebarItems = [
   {
-    title: 'Upload Image',
-    url: '/dashboard',
+    title: "Upload Image",
+    url: "/dashboard",
     icon: LayoutDashboardIcon,
   },
   {
-    title: 'Find a Dermatologist',
-    url: '#',
+    title: "Find a Dermatologist",
+    url: "dashboard/findDermatologist",
     icon: ListIcon,
   },
   {
-    title: 'Progress Tracker',
-    url: '/dashboard/progressTracker',
+    title: "Progress Tracker",
+    url: "/dashboard/progressTracker",
     icon: BarChartIcon,
   },
-  {
-    title: 'Profile',
-    url: '#',
-    icon: UsersIcon,
-  },
-]
+];
 
 const AppSidebar = ({ ...props }) => {
-   const router = useRouter()
-   const { open } = useSidebar();
-    const { getUser, signOutUser } = useContext(AuthContext)
-   const handleLogout = () => {
-      signOutUser()
-      toast.success('Signed out successfully!')
-      router.push('/login')
-    }
+  const router = useRouter();
+  const { open } = useSidebar();
+  const { getUser, signOutUser } = useContext(AuthContext);
+  const handleLogout = () => {
+    signOutUser();
+    toast.success("Signed out successfully!");
+    router.push("/login");
+  };
   return (
     <Sidebar {...props}>
-      <SidebarHeader className='border-b'>
-        <SidebarMenu className="py-2 px-4 flex flex-row items-center justify-between ">
-            <Logo/>
-            {
-              open && <SidebarTrigger />
-            }
+      <SidebarHeader className="border-b">
+        <SidebarMenu className="flex flex-row items-center justify-between px-4 py-2">
+          <Logo />
+          {open && <SidebarTrigger />}
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={sidebarItems} />
       </SidebarContent>
       <SidebarFooter>
-        <Button onClick={handleLogout} className='px-3 py-1.5 w-full'>
-          <LogOut className='w-4 h-4' />
-          <span className='ml-2'>Sign Out</span>
+        <Button onClick={handleLogout} className="w-full px-3 py-1.5">
+          <LogOut className="h-4 w-4" />
+          <span className="ml-2">Sign Out</span>
         </Button>
       </SidebarFooter>
     </Sidebar>
-  )
-}
+  );
+};
 
-export default AppSidebar
+export default AppSidebar;
