@@ -1,24 +1,37 @@
-import { db } from './firebase'; // your firebase config file
+import { db } from "./firebase"; // your firebase config file
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
-import { v4 as uuidv4 } from 'uuid'; // to generate unique id for each disease
+import { v4 as uuidv4 } from "uuid"; // to generate unique id for each disease
 
 /**
  * Adds a disease record to the logged-in user's Firestore document.
- * 
+ *
  * @param {string} userEmail - The email of the logged-in user.
  * @param {string} diseaseName - Name of the disease.
  * @param {string} severity - Severity level of the disease.
  * @param {string} imageUrl - URL of the uploaded disease image.
  */
-export async function addDiseaseForUser(userEmail, diseaseName, severity, imageUrl) {
+export async function addDiseaseForUser(
+  userEmail,
+  diseaseName,
+  severity,
+  imageUrl
+) {
   try {
-    const userDocRef = doc(db, 'users', userEmail);
+    const userDocRef = doc(db, "users", userEmail);
 
     const diseaseData = {
-      id: uuidv4(), // generate unique ID
+      id: uuidv4(),
       name: diseaseName,
       severity: severity,
-      imageUrl: imageUrl
+      imageUrl: imageUrl,
+      progress: [
+        {
+          id: uuidv4(),
+          severity,
+          imgUrl: imageUrl,
+          createdAt: Date.now(),
+        },
+      ],
     };
 
     const userDocSnap = await getDoc(userDocRef);
@@ -26,12 +39,12 @@ export async function addDiseaseForUser(userEmail, diseaseName, severity, imageU
     if (userDocSnap.exists()) {
       // If user already exists → update diseases array
       await updateDoc(userDocRef, {
-        diseases: arrayUnion(diseaseData)
+        diseases: arrayUnion(diseaseData),
       });
     } else {
       // If user doesn't exist → create document with diseases array
       await setDoc(userDocRef, {
-        diseases: [diseaseData]
+        diseases: [diseaseData],
       });
     }
 
@@ -48,7 +61,7 @@ export async function getDiseasesForUser(userEmail) {
   }
 
   try {
-    const userDocRef = doc(db, 'users', userEmail);
+    const userDocRef = doc(db, "users", userEmail);
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
@@ -61,5 +74,58 @@ export async function getDiseasesForUser(userEmail) {
   } catch (error) {
     console.error("Error fetching diseases ❌:", error);
     return [];
+  }
+}
+
+/**
+ * Adds a progress entry to a specific disease for a user.
+ *
+ * @param {string} imageUrl - The URL of the new progress image.
+ * @param {string} severity - The severity level for this progress update.
+ * @param {string} userEmail - The email of the user (used as document ID).
+ * @param {string} diseaseId - The ID of the disease to update.
+ */
+export async function addProgressToDisease(
+  imageUrl,
+  severity,
+  userEmail,
+  diseaseId
+) {
+  try {
+    const userDocRef = doc(db, "users", userEmail);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      console.error("User document does not exist ❌");
+      return;
+    }
+
+    const userData = userDocSnap.data();
+    const diseases = userData.diseases || [];
+
+    // Find the disease by ID
+    const updatedDiseases = diseases.map((disease) => {
+      if (disease.id === diseaseId) {
+        // Add the new progress entry to the existing progress array
+        const updatedProgress = [
+          ...(disease.progress || []),
+          { severity, imgUrl: imageUrl, createdAt: Date.now(), id: uuidv4() },
+        ];
+        return {
+          ...disease,
+          progress: updatedProgress,
+        };
+      }
+      return disease; // Other diseases remain unchanged
+    });
+
+    // Update the diseases array in Firestore
+    await updateDoc(userDocRef, {
+      diseases: updatedDiseases,
+    });
+
+    console.log("Progress added successfully ✅");
+  } catch (error) {
+    console.error("Error adding progress ❌:", error);
   }
 }

@@ -29,31 +29,29 @@ import { useContext } from 'react'
 
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-const data = {
-  navMain: [
-    {
-      title: 'Upload Image',
-      url: '/dashboard',
-      icon: LayoutDashboardIcon,
-    },
-    {
-      title: 'Find a Dermatologist',
-      url: '#',
-      icon: ListIcon,
-    },
-    {
-      title: 'Progress Tracker',
-      url: '/dashboard/progressTracker',
-      icon: BarChartIcon,
-    },
-   
-    {
-      title: 'Profile',
-      url: '#',
-      icon: UsersIcon,
-    },
-  ],
-}
+
+const sidebarItems = [
+  {
+    title: 'Upload Image',
+    url: '/dashboard',
+    icon: LayoutDashboardIcon,
+  },
+  {
+    title: 'Find a Dermatologist',
+    url: '#',
+    icon: ListIcon,
+  },
+  {
+    title: 'Progress Tracker',
+    url: '/dashboard/progressTracker',
+    icon: BarChartIcon,
+  },
+  {
+    title: 'Profile',
+    url: '#',
+    icon: UsersIcon,
+  },
+]
 
 const AppSidebar = ({ ...props }) => {
    const router = useRouter()
@@ -75,7 +73,7 @@ const AppSidebar = ({ ...props }) => {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={sidebarItems} />
       </SidebarContent>
       <SidebarFooter>
         <Button onClick={handleLogout} className='px-3 py-1.5 w-full'>

@@ -13,22 +13,20 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Loader } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { addDiseaseForUser } from "../../firebase/firestoreConnect"
+import { addDiseaseForUser } from "../../firebase/firestoreConnect";
+
 const Dashboard = () => {
   const { getUser } = useContext(AuthContext)
   const router = useRouter()
   const [image, setImage] = useState(null);  
   const [isUploadingImageAndFetchingName, setisUploadingImageAndFetchingName] = useState(false)
   const [isDiseaseInfoLoading, setIsDiseaseInfoLoading] = useState(false)
-  const [imagePreview, setImagePreview] = useState(null); 
-  const [diseaseName, setDiseaseName] = useState();
-  const [severity, setSeverity] = useState()
-  const [diseaseInfo, setDiseaseInfo] = useState();
+  const [diseaseName, setDiseaseName] = useState(null);
+  const [severity, setSeverity] = useState(null);
+  const [diseaseInfo, setDiseaseInfo] = useState(null);
 
   const handleFileChange = (filewithpreview) => {
-    console.log(filewithpreview)
     setImage(filewithpreview.file)
-    setImagePreview(filewithpreview.preview)
   };
   
 
@@ -50,6 +48,9 @@ const handleUpload = async () => {
   }
 
   const [d1, d2] = result.result.split(',');
+
+  setDiseaseName(d1);
+  setSeverity(d2);
 
   if (!d1 || !d2) {
     console.error('Disease name or severity is missing');
@@ -73,10 +74,10 @@ const handleUpload = async () => {
     return;
   }
 
-  setisUploadingImageAndFetchingName(false);
   const user = getUser();
-
   await addDiseaseForUser(user.email, d1, d2, url);
+
+  setisUploadingImageAndFetchingName(false);
 };
 
   const handleDiseaseData = async () =>{
@@ -91,7 +92,6 @@ const handleUpload = async () => {
 
   const handleRemove = () => {
     setImage(null);
-    setImagePreview(null);
     setDiseaseName(null);
     setSeverity(null);
     setDiseaseInfo(null);
@@ -102,7 +102,7 @@ const handleUpload = async () => {
     if (user == null) {
       router.push('/login')  
     }
-  }, [getUser, router])  
+  }, [getUser, router]);
 
   return (
     <div className="min-h-screen w-full relative">
