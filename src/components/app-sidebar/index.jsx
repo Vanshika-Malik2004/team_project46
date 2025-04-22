@@ -38,7 +38,7 @@ const sidebarItems = [
   },
   {
     title: "Find a Dermatologist",
-    url: "dashboard/findDermatologist",
+    url: "/dashboard/findDermatologist",
     icon: ListIcon,
   },
   {

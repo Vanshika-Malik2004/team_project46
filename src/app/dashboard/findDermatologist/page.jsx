@@ -1,19 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "@/context/authContext";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { Loader } from "lucide-react";
 
 export default function FindDermatologistsPage() {
   const [dermatologists, setDermatologists] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const { getUser } = useContext(AuthContext);
+  const router = useRouter();
   useEffect(() => {
-    if (typeof window !== "undefined" && !window.google) {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
-      script.async = true;
-      document.body.appendChild(script);
+    const user = getUser();
+    if (user == null) {
+      router.push("/login");
+      toast.error("Please Login First");
+    } else {
+      if (typeof window !== "undefined" && !window.google) {
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
+        script.async = true;
+        document.body.appendChild(script);
+      }
     }
-  }, []);
+  }, [[getUser, router]]);
 
   const findNearbyDermatologists = () => {
     if (!navigator.geolocation) {
@@ -45,42 +56,50 @@ export default function FindDermatologistsPage() {
       });
     });
   };
-
+  const current_user = getUser();
   return (
     <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Find Nearby Dermatologists 🧑‍⚕️</h1>
-
-      <button
-        onClick={findNearbyDermatologists}
-        className="rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
-      >
-        Find Dermatologists
-      </button>
-
-      {loading && <p className="mt-4">Loading...</p>}
-
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-        {dermatologists.map((place) => (
-          <div
-            key={place.place_id}
-            className="rounded border p-4 shadow transition hover:shadow-md"
+      {!current_user ? (
+        <div className="flex h-screen w-full items-center justify-center">
+          <Loader />
+        </div>
+      ) : (
+        <>
+          {" "}
+          <h1 className="mb-4 text-2xl font-bold">
+            Find Nearby Dermatologists 🧑‍⚕️
+          </h1>
+          <button
+            onClick={findNearbyDermatologists}
+            className="rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
           >
-            <h2 className="text-lg font-semibold">{place.name}</h2>
-            <p className="text-sm text-gray-600">{place.vicinity}</p>
-            {place.rating && (
-              <p className="mt-2 text-sm">Rating: {place.rating} ⭐</p>
-            )}
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${place.geometry.location.lat()},${place.geometry.location.lng()}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-block text-blue-500 hover:underline"
-            >
-              View on Map
-            </a>
+            Find Dermatologists
+          </button>
+          {loading && <p className="mt-4">Loading...</p>}
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {dermatologists.map((place) => (
+              <div
+                key={place.place_id}
+                className="rounded border p-4 shadow transition hover:shadow-md"
+              >
+                <h2 className="text-lg font-semibold">{place.name}</h2>
+                <p className="text-sm text-gray-600">{place.vicinity}</p>
+                {place.rating && (
+                  <p className="mt-2 text-sm">Rating: {place.rating} ⭐</p>
+                )}
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${place.geometry.location.lat()},${place.geometry.location.lng()}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-block text-blue-500 hover:underline"
+                >
+                  View on Map
+                </a>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 }

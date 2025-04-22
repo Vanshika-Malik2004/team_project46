@@ -129,3 +129,60 @@ export async function addProgressToDisease(
     console.error("Error adding progress ❌:", error);
   }
 }
+
+/**
+ * Deletes a progress entry from a disease, and deletes disease if no progress remains.
+ *
+ * @param {string} userEmail - The user's email (used as document ID).
+ * @param {string} diseaseId - The ID of the disease.
+ * @param {string} progressId - The ID of the progress item to delete.
+ */
+export async function deleteProgressAndPossiblyDisease(
+  userEmail,
+  diseaseId,
+  progressId
+) {
+  try {
+    const userDocRef = doc(db, "users", userEmail);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) {
+      console.error("User document does not exist ❌");
+      return;
+    }
+
+    const userData = userDocSnap.data();
+    const diseases = userData.diseases || [];
+
+    const updatedDiseases = diseases.reduce((acc, disease) => {
+      if (disease.id === diseaseId) {
+        // Remove the specified progress item
+        const updatedProgress = (disease.progress || []).filter(
+          (p) => p.id !== progressId
+        );
+
+        if (updatedProgress.length > 0) {
+          // If progress still exists, update the disease
+          acc.push({
+            ...disease,
+            progress: updatedProgress,
+          });
+        } else {
+          // If no progress remains, skip adding this disease (effectively deleting it)
+          console.log(
+            `Disease with ID ${diseaseId} deleted because no progress left.`
+          );
+        }
+      } else {
+        acc.push(disease); // Other diseases remain unchanged
+      }
+      return acc;
+    }, []);
+
+    await updateDoc(userDocRef, { diseases: updatedDiseases });
+
+    console.log("Progress deleted successfully ✅");
+  } catch (error) {
+    console.error("Error deleting progress or disease ❌:", error);
+  }
+}
