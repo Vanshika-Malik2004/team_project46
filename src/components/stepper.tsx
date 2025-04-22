@@ -28,7 +28,7 @@ import { uploadImage } from "@/BackendConnect/imageupload";
 import { toast } from "react-toastify";
 import { AuthContext } from "@/context/authContext";
 import { addProgressToDisease } from "@/firebase/firestoreConnect";
-
+import { deleteProgressAndPossiblyDisease } from "@/firebase/firestoreConnect";
 interface StepperComponentProps {
   progressSteps: {
     severity: string;
@@ -146,9 +146,11 @@ const StepperComponent = ({
     onAddNewEntry();
   };
 
-  const handleDeleteProgressItem = (progressId: string) => {
+  const handleDeleteProgressItem = async (progressId: string) => {
     console.log("Delete progress item:", progressId);
     // Future implementation will delete this progress entry
+    await deleteProgressAndPossiblyDisease(user.email, diseaseId, progressId);
+    onAddNewEntry();
   };
 
   return (

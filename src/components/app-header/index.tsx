@@ -25,7 +25,7 @@ const AppHeader: React.FC = ({}) => {
           {!openMobile && isMobile && <SidebarTrigger />}
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold">Welcome to radient</h1>
+              <h1 className="text-2xl font-bold">Welcome to Radiant</h1>
             </div>
           </div>
         </div>
